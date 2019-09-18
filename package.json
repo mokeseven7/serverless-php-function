@@ -1,0 +1,17 @@
+{
+  "name": "phplayer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "serverless.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@serverless/core": "^1.0.0",
+    "aws-sdk": "^2.529.0"
+  },
+  "devDependencies": {
+    "bestzip": "^2.1.4",
+    "fs-extra": "^8.1.0"
+  }
+}
