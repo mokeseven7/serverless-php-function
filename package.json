@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@serverless/aws-lambda": "^3.0.0",
+    "@serverless/aws-s3": "^3.1.0",
     "@serverless/core": "^1.0.0",
-    "aws-sdk": "^2.529.0"
+    "aws-sdk": "^2.532.0"
   },
   "devDependencies": {
     "bestzip": "^2.1.4",
