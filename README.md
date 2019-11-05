@@ -237,10 +237,11 @@ function sendResponse($invocationId, $response)
 
 If you've made it this far, give yourself a pat on the back. We are moments away from finishing our custom runtime layer, and being able to jump into some actual code!
 
-We'll need to upload everything we've created so far as a zip file to lambda, so lets create that zip now:
+We'll need to upload everything we've created so far as a zip file to lambda, so lets create two zip files, one for our lambda, and one for our vendor dependencies:
 
 ```bash
 zip -r runtime.zip bin bootstrap
+zip -r vendor.zip vendor/
 ```
 
 Finally, we'll need a way to actually upload this zip file to aws, and using the aws cli sounds like the easiest option.
@@ -264,7 +265,9 @@ Default output format [None]: json
 
 Feel free to change the default region, and output format if desired.
 
-With the aws cli configure, we are now ready to publish our layer to lambda:
+With the aws cli configure, we are now ready to publish our layers to lambda:
+
+First, lets publish the runtime:
 
 ```bash
 aws lambda publish-layer-version \
@@ -279,8 +282,8 @@ Upon success, you should recieve a JSON object response, that looks simliar to t
 {
 	"Content": {
 		"CodeSize": 11586149,
-		"CodeSha256": "0jhAF6gKlUbUfTp3Js9Za3ryFt6C4oxbc2HTZ413fOU=",
-		"Location": "https://awslambda-us-west-2-layers.s3.us-west-2.amazonaws.com/snapshots/869029932727/php-73-runtime-d4a7728e-f036-4208-881c-65fc70af9c38?versionId=7ZmnaCrgWUc1Pkd2_eJl9kdLbFgDrwiu&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEE4aCXVzLXdlc3QtMiJHMEUCIHY11iwRcNYByok0zW6ekfTNhSgzUT%2FybyWPGsrKZ48mAiEAyl0m%2Fqqc6o2kT1bOumsSHRj3TgG0M7Oh5kXXYPBqdhkq0QIIZhACGgw1MDIyOTcwNzYxNjMiDPVLe22xBib5QQF3HSquAiIho8NVzRVUZ9HQMhR7l7Ln%2BdjzO4%2FMpLIL%2FtC18nwBChR86iAyl3EntFsYVsLB51LCrzO%2BFVmyKLbk%2FqtNPX4x6%2FeY2WCQdSifwGFnt0fOCMVI5P87rFLhhRbY%2BwjFqY0FUI23wnm0jtfF%2B%2BsNFvOy6Yj6uReg1tH00f0l%2BiCL9%2BE4jxbiz%2BULq9NJCn11tGpwAaAEDmduEkfiQp4%2F%2FQM%2BblhS4XGpGKCZ1jhIU5FL88f%2FkES%2BrUoDf68GGLlRvu5LD924DaOmx6jSRQ9FUqbQTIeuyEve73WFYRVjORK4GB7K22v0G%2FaAc3SThwso32soo72kvOhOee811vls6RhTcAZbp0pntxd2P7wcQePGMdCsNRnKbpP0zgG0gaTEfz6ZfA9v%2BIFu67YTxwC%2BMI3Yh%2B4FOs4CmrF92J6a63VugfZ40lxdQ%2FmvGK8V%2Br4yHrgvRx4U%2Fawa%2FrW2%2BfI1VriewToG0r9o6fLaI%2FYGMCKi0J4RMqQQVpjq70knrPjMFws9hFuYoAQANn9%2BSwUoZSV0d9TQb5lRlxegBYkNvheItL6DF1YkyY9x6O%2BDWUajHepLxtvi7G7zb3KNn2b%2BKbqartTBFTubEizRKxfM9RgdNpwpl4ITud4AvmiXpHGvPY3FhyjojuCQkQNYVFXZ3ZCQ0EDr5tp2y3hG5bzTCRZA49UO8G6UwNqcEChAz%2F%2FniLdQLOT7Q15bF9FiOnUNE5ghRti2bnMHMErFctW35N1r9DwErDtQxUDkwalqL22wybJDKD2uBHLoCj2XvHCgP4XGDRQ9LR5qdI2osRPCm%2FlSUFLvqo1ILDiNMjonTf8LOZPZrvobKv7LZh5mdF0V1hg5k%2ByRpQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20191105T224344Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAXJ4Z5EHBTKA2LYV2%2F20191105%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=5aa4e4d847084b53760449134e1b60eef8de479756c31c306649b5565644f0ab"
+		"CodeSha256": "***",
+		"Location": "***"
 	},
 	"LayerVersionArn": "arn:aws:lambda:us-west-2:869029932727:layer:php-73-runtime:1",
 	"Version": 1,
@@ -291,5 +294,33 @@ Upon success, you should recieve a JSON object response, that looks simliar to t
 ```
 
 Make note of both the LayerVersionArn, and the LayerArn.
+
+Next, lets publish our vendor dependencies:
+
+```bash
+aws lambda publish-layer-version \
+    --layer-name php-73-vendor \
+    --zip-file fileb://vendor.zip \
+    --region us-west-2
+```
+
+Upon success, you should recieve a JSON object response, that looks simliar to the following:
+
+```json
+{
+	"Content": {
+		"CodeSize": 217920,
+		"CodeSha256": "***",
+		"Location": "***"
+	},
+	"LayerVersionArn": "arn:aws:lambda:us-west-2:869029932727:layer:php-73-vendor:1",
+	"Version": 1,
+	"Description": "",
+	"CreatedDate": "2019-11-05T22:55:30.906+0000",
+	"LayerArn": "arn:aws:lambda:us-west-2:869029932727:layer:php-73-vendor"
+}
+```
+
+Again, make note of both the LayerVersionArn and the LayerArn.
 
 Congratulations! You've just compiled php from source, boostraped the lambda environment to run PHP, and created a lambda layer! Next, we'll get to actually writing some php code!
